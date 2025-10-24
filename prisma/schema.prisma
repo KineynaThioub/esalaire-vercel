@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"  // ✅ Changé de mysql à postgresql
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(uuid())
+  identifier     String          @unique
+  password       String
+  firstName      String
+  lastName       String
+  email          String          @unique
+  department     String
+  position       String
+  createdAt      DateTime        @default(now())
+  bulletins      Bulletin[]
+  connectionLogs ConnectionLog[]
+
+  @@map("users")
+}
+
+model Bulletin {
+  id               String            @id @default(uuid())
+  userId           String
+  title            String
+  period           String
+  date             DateTime
+  fileSize         String
+  status           String            @default("available")
+  employeeNumber   String
+  employeeName     String
+  department       String
+  position         String
+  category         String
+  grossSalary      Float
+  totalDeductions  Float
+  netSalary        Float
+  createdAt        DateTime          @default(now())
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deductions       Deduction[]
+  salaryComponents SalaryComponent[]
+
+  @@index([userId])
+  @@map("bulletins")
+}
+
+model SalaryComponent {
+  id         String   @id @default(uuid())
+  bulletinId String
+  label      String
+  base       Float
+  rate       Float
+  amount     Float
+  bulletin   Bulletin @relation(fields: [bulletinId], references: [id], onDelete: Cascade)
+
+  @@index([bulletinId])
+  @@map("salary_components")
+}
+
+model Deduction {
+  id         String   @id @default(uuid())
+  bulletinId String
+  label      String
+  amount     Float
+  bulletin   Bulletin @relation(fields: [bulletinId], references: [id], onDelete: Cascade)
+
+  @@index([bulletinId])
+  @@map("deductions")
+}
+
+model ConnectionLog {
+  id        String   @id @default(uuid())
+  userId    String
+  timestamp DateTime @default(now())
+  ipAddress String?
+  userAgent String?  // ✅ @db.Text retiré (non nécessaire pour PostgreSQL)
+  success   Boolean  @default(true)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("connection_logs")
+}
