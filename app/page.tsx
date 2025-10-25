@@ -88,7 +88,7 @@ export default function HomePage() {
               {loading ? "Vérification..." : "Continuer"}
             </Button>
 
-            <p className="text-xs text-center text-muted-foreground">Identifiant de test: SOPH001 ou DEMO001</p>
+            <p className="text-xs text-center text-muted-foreground">Identifiant de test: SOPH001 </p>
           </form>
         </CardContent>
       </Card>
